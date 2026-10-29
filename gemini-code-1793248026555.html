@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>12小時與24小時報時制</title>
+  <style>
+    :root {
+      --bg-cream: #fff9fb;
+      --bg-dots: #fce7f3;
+      --paper: #ffffff;
+      --chii-pink: #f472b6;
+      --chii-pink-light: #fdf2f8;
+      --hachi-blue: #38bdf8;
+      --hachi-blue-light: #f0f9ff;
+      --usagi-yellow: #facc15;
+      --usagi-yellow-light: #fefce8;
+      --ink-brown: #4a3728;
+      --ink-muted: #7c6553;
+      --shadow-cute: 0 5px 0 #e5d0c5;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "PingFang HK", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      background-color: var(--bg-cream);
+      background-image:
+        radial-gradient(var(--bg-dots) 2.2px, transparent 2.2px),
+        radial-gradient(#e0f2fe 2.2px, var(--bg-cream) 2.2px);
+      background-size: 36px 36px;
+      background-position: 0 0, 18px 18px;
+      color: var(--ink-brown);
+      line-height: 1.5;
+      padding: 14px 12px 40px;
+    }
+
+    .notebook-shell {
+      max-width: 1140px;
+      margin: 0 auto;
+      background: var(--paper);
+      border: 3px solid var(--ink-brown);
+      border-radius: 26px;
+      box-shadow: 0 8px 0 #d9c3b6, 0 14px 32px rgba(74, 55, 40, 0.08);
+      overflow: hidden;
+    }
+
+    .top-deco-bar {
+      background: linear-gradient(90deg, #fce7f3 0%, #e0f2fe 50%, #fef9c3 100%);
+      border-bottom: 3px dashed var(--ink-brown);
+      padding: 12px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chii-avatars {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .avatar-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2.5px solid var(--ink-brown);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 0 rgba(74, 55, 40, 0.16);
+      flex-shrink: 0;
+    }
+
+    .title-text h1 {
+      font-size: 1.52rem;
+      font-weight: 900;
+      color: var(--ink-brown);
+    }
+
+    .title-text p {
+      font-size: 0.92rem;
+      color: var(--ink-muted);
+      font-weight: 700;
+    }
+
+    .reward-counter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 2.5px solid var(--ink-brown);
+      border-radius: 999px;
+      padding: 6px 14px;
+      box-shadow: 0 3px 0 #e5d0c5;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .mission-bar {
+      margin: 14px 18px 0;
+      padding: 12px 16px;
+      background: var(--usagi-yellow-light);
+      border: 2.5px solid var(--ink-brown);
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 0 #e5d0c5;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mission-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .mission-row-divider {
+      border-top: 2px dashed #e5d0c5;
+      padding-top: 10px;
+    }
+
+    .mission-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .step-tag {
+      background: var(--chii-pink);
+      color: #fff;
+      border: 2px solid var(--ink-brown);
+      font-weight: 800;
+      font-size: 0.86rem;
+      padding: 2px 10px;
+      border-radius: 999px;
+    }
+
+    .mission-label {
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .btn {
+      appearance: none;
+      border: 2.5px solid var(--ink-brown);
+      background: #fff;
+      color: var(--ink-brown);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 800;
+      padding: 7px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 3px 0 var(--ink-brown);
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 0 var(--ink-brown);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--ink-brown);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-pink { background: #fbcfe8; }
+    .btn-blue { background: #bae6fd; }
+    .btn-yellow { background: #fef08a; }
+    .btn-green { background: #bbf7d0; color: #14532d; }
+
+    .preset-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .preset-chip {
+      border: 2px solid var(--ink-brown);
+      background: #fff;
+      color: var(--ink-brown);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 0.88rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .preset-chip.active {
+      background: var(--hachi-blue);
+      color: #fff;
+    }
+
+    .preset-chip.custom-chip.active {
+      background: var(--chii-pink);
+      color: #fff;
+    }
+
+    .control-pill-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff;
+      border: 2px solid var(--ink-brown);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.86rem;
+      font-weight: 800;
+      flex-wrap: wrap;
+    }
+
+    .mini-ctrl-btn {
+      border: 2px solid var(--ink-brown);
+      background: #f8fafc;
+      color: var(--ink-brown);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .mini-ctrl-btn.board-active {
+      background: #38bdf8;
+      color: #fff;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 18px;
+      padding: 16px 18px 22px;
+      align-items: start;
+    }
+
+    @media (max-width: 920px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .canvas-card {
+      background: #fff;
+      border: 2.5px solid var(--ink-brown);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      box-shadow: var(--shadow-cute);
+    }
+
+    .canvas-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .step-progress {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--hachi-blue-light);
+      border: 2px solid var(--ink-brown);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 0.92rem;
+      font-weight: 800;
+    }
+
+    .period-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.88rem;
+      font-weight: 800;
+      background: #fef9c3;
+      color: #854d0e;
+      border: 2px solid var(--ink-brown);
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+
+    .period-badge.night {
+      background: #e0e7ff;
+      color: #1e3a8a;
+    }
+
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      background: #fffdf9;
+      border: 2.5px solid var(--ink-brown);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .canvas-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    /* 右欄：題目與作答區 */
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .question-card {
+      background: linear-gradient(180deg, #fdf2f8 0%, #ffffff 100%);
+      border: 2.5px solid var(--ink-brown);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-cute);
+    }
+
+    /* 題目時間顯示牌 */
+    .time-question-board {
+      background: #fff;
+      border: 2.5px solid var(--ink-brown);
+      border-radius: 16px;
+      padding: 12px 14px;
+      text-align: center;
+      margin-bottom: 14px;
+      box-shadow: 0 3px 0 #f3e5dc;
+    }
+
+    .q-type-label {
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: var(--ink-muted);
+      margin-bottom: 4px;
+    }
+
+    .q-time-value {
+      font-size: 1.85rem;
+      font-weight: 900;
+      color: #be185d;
+      letter-spacing: 0.04em;
+    }
+
+    /* 學生作答輸入框區塊 */
+    .answer-zone {
+      background: var(--usagi-yellow-light);
+      border: 2.5px solid var(--ink-brown);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .answer-zone-title {
+      font-size: 0.92rem;
+      font-weight: 900;
+      margin-bottom: 10px;
+      color: var(--ink-brown);
+    }
+
+    .ampm-selector {
+      display: inline-flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .ampm-btn {
+      border: 2.5px solid var(--ink-brown);
+      background: #fff;
+      color: var(--ink-brown);
+      font-size: 1rem;
+      font-weight: 900;
+      padding: 6px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 3px 0 var(--ink-brown);
+    }
+
+    .ampm-btn.selected-am {
+      background: #fef08a;
+      color: #854d0e;
+    }
+
+    .ampm-btn.selected-pm {
+      background: #bae6fd;
+      color: #0c4a6e;
+    }
+
+    .digital-inputs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 1.5rem;
+      font-weight: 900;
+    }
+
+    .time-num-input {
+      width: 78px;
+      height: 54px;
+      border: 3px solid var(--ink-brown);
+      border-radius: 14px;
+      background: #fff;
+      font-size: 1.55rem;
+      font-weight: 900;
+      text-align: center;
+      color: var(--ink-brown);
+      font-family: inherit;
+    }
+
+    .time-num-input.wrong-box {
+      border-color: #e11d48;
+      background: #ffe4e6;
+      color: #be123c;
+    }
+
+    /* 上次草稿殘影提示條 */
+    .ghost-draft-pill {
+      display: none;
+      margin-top: 8px;
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: #475569;
+      background: #f1f5f9;
+      border: 1.5px dashed #94a3b8;
+      border-radius: 999px;
+      padding: 3px 12px;
+    }
+
+    .ghost-draft-pill.show {
+      display: inline-block;
+    }
+
+    /* 自訂題目面板 */
+    .custom-setup-box {
+      display: none;
+      background: #fdf2f8;
+      border: 2.5px solid #ec4899;
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .custom-setup-box.show {
+      display: block;
+    }
+
+    .character-stage {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .char-figure {
+      width: 64px;
+      height: 64px;
+      background: #fff;
+      border: 2.5px solid var(--ink-brown);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 3px 0 #e5d0c5;
+    }
+
+    .speech-bubble {
+      background: #fff;
+      border: 2.5px solid var(--ink-brown);
+      border-radius: 16px;
+      padding: 9px 12px;
+      flex: 1;
+      font-size: 0.92rem;
+      font-weight: 800;
+    }
+
+    .speech-speaker {
+      display: inline-block;
+      font-size: 0.76rem;
+      font-weight: 800;
+      padding: 1px 8px;
+      border-radius: 999px;
+      margin-bottom: 3px;
+      border: 1.5px solid var(--ink-brown);
+    }
+
+    .speaker-chii { background: #fbcfe8; }
+    .speaker-hachi { background: #bae6fd; }
+    .speaker-usagi { background: #fef08a; }
+
+    .big-check-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.08rem;
+      justify-content: center;
+      background: #f472b6;
+      color: #fff;
+      border: 2.5px solid var(--ink-brown);
+      border-radius: 14px;
+    }
+
+    .big-check-btn:hover:not(:disabled) {
+      background: #ec4899;
+    }
+
+    .feedback-box {
+      background: #fff;
+      border: 2.5px solid var(--ink-brown);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      box-shadow: var(--shadow-cute);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 2px solid var(--ink-brown);
+      margin-bottom: 8px;
+    }
+
+    .status-wait { background: #f3f4f6; }
+    .status-ok { background: #bbf7d0; color: #14532d; }
+    .status-retry { background: #fecdd3; color: #881337; }
+
+    .guide-step {
+      border: 2px solid var(--ink-brown);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-top: 8px;
+      background: var(--hachi-blue-light);
+    }
+
+    .guide-step.step-pink { background: var(--chii-pink-light); }
+    .guide-step.step-yellow { background: var(--usagi-yellow-light); }
+
+    .guide-step-title {
+      font-size: 0.92rem;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .guide-step p {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .stamp-victory {
+      border: 2.5px dashed #16a34a;
+      background: #f0fdf4;
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    /* ====== 答對彈出獎勵卡視窗 (Modal) ====== */
+    .reward-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(74, 55, 40, 0.65);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 16px;
+    }
+
+    .reward-modal-backdrop.show {
+      display: flex;
+      animation: popIn 0.25s ease-out;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .reward-modal-card {
+      background: #fffdf9;
+      border: 4px solid var(--ink-brown);
+      border-radius: 26px;
+      max-width: 480px;
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 10px 0 #d9c3b6, 0 20px 40px rgba(0,0,0,0.25);
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+
+    .reward-modal-title {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #be185d;
+      margin-bottom: 6px;
+    }
+
+    .reward-modal-sub {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink-brown);
+      background: #fef08a;
+      border: 2px solid var(--ink-brown);
+      border-radius: 12px;
+      padding: 6px 12px;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+
+    .reward-img-box {
+      background: #fff;
+      border: 3px solid var(--ink-brown);
+      border-radius: 16px;
+      padding: 8px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 0 #e5d0c5;
+    }
+
+    .reward-img-box img {
+      width: 100%;
+      max-height: 360px;
+      object-fit: contain;
+      border-radius: 10px;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="notebook-shell">
+    <!-- 頂部標題 -->
+    <header class="top-deco-bar">
+      <div class="title-group">
+        <div class="chii-avatars" aria-hidden="true">
+          <div class="avatar-badge">
+            <svg width="38" height="38" viewBox="0 0 64 64">
+              <circle cx="16" cy="16" r="9" fill="#fff" stroke="#4a3728" stroke-width="3.5"/>
+              <circle cx="48" cy="16" r="9" fill="#fff" stroke="#4a3728" stroke-width="3.5"/>
+              <circle cx="32" cy="35" r="22" fill="#fff" stroke="#4a3728" stroke-width="3.5"/>
+              <ellipse cx="19" cy="39" rx="4.5" ry="2.6" fill="#f9a8d4"/>
+              <ellipse cx="45" cy="39" rx="4.5" ry="2.6" fill="#f9a8d4"/>
+              <circle cx="24" cy="33" r="3" fill="#4a3728"/>
+              <circle cx="40" cy="33" r="3" fill="#4a3728"/>
+              <path d="M29 38 Q32 41 35 38" fill="none" stroke="#4a3728" stroke-width="2.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="avatar-badge">
+            <svg width="38" height="38" viewBox="0 0 64 64">
+              <polygon points="12,24 16,8 27,18" fill="#7dd3fc" stroke="#4a3728" stroke-width="3.5" stroke-linejoin="round"/>
+              <polygon points="52,24 48,8 37,18" fill="#7dd3fc" stroke="#4a3728" stroke-width="3.5" stroke-linejoin="round"/>
+              <circle cx="32" cy="36" r="21" fill="#fff" stroke="#4a3728" stroke-width="3.5"/>
+              <path d="M13,27 Q24,25 32,16 Q40,25 51,27 A21,21 0 0,0 13,27 Z" fill="#7dd3fc"/>
+              <circle cx="24" cy="34" r="3" fill="#4a3728"/>
+              <circle cx="40" cy="34" r="3" fill="#4a3728"/>
+              <path d="M29 39 Q32 42 35 39" fill="none" stroke="#4a3728" stroke-width="2.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="title-text">
+          <h1>12小時與24小時報時制</h1>
+          <p>1. 睇雙圈時鐘 ➔ 2. 輸入轉換時間 ➔ 3. 按「檢查答案」換獎勵卡！</p>
+        </div>
+      </div>
+
+      <div class="reward-counter">
+        <span>🏆 答對次數：<strong id="stampCount">0</strong> 次</span>
+        <button type="button" class="btn btn-yellow" id="viewRewardCardBtn" style="display:none; padding:4px 10px; font-size:0.82rem;">
+          🎁 查看獎勵卡
+        </button>
+      </div>
+    </header>
+
+    <!-- 第 1 步：選擇題型與觀察工具 -->
+    <section class="mission-bar">
+      <div class="mission-row">
+        <div class="mission-left">
+          <span class="step-tag">第 1 步</span>
+          <span class="mission-label">選擇練習模式：</span>
+        </div>
+
+        <div class="preset-group" id="modeButtons">
+          <button type="button" class="preset-chip active" data-mode="to24">🕒 1. 12小時 ➔ 24小時</button>
+          <button type="button" class="preset-chip" data-mode="to12">📟 2. 24小時 ➔ 12小時</button>
+          <button type="button" class="preset-chip" data-mode="traps">⚠️ 3. 中午與午夜陷阱</button>
+          <button type="button" class="preset-chip custom-chip" data-mode="custom">✏️ 4. 自訂題目</button>
+        </div>
+      </div>
+
+      <div class="mission-row mission-row-divider">
+        <div class="control-pill-group">
+          <span>🎨 選擇圖解工具：</span>
+          <button type="button" class="mini-ctrl-btn board-active" id="viewClockBtn">🕰️ 內外雙圈時鐘</button>
+          <button type="button" class="mini-ctrl-btn" id="viewRulerBtn">📏 24小時時間尺</button>
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-yellow" id="magicJumpBtn">
+            ✨ 施展 +12 / -12 魔法動畫
+          </button>
+          <button type="button" class="btn btn-blue" id="nextRandomQBtn">
+            🎲 換下一題
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 主工作區 -->
+    <main class="workspace">
+      <!-- 左欄：雙圈時鐘 / 24小時時間尺 視覺化畫布 -->
+      <section class="canvas-card">
+        <div class="canvas-header">
+          <div class="step-progress" id="visualTitleBadge">
+            🕰️ 內圈：上午 (0~11) ｜ 外圈：下午 (+12)
+          </div>
+          <div class="period-badge" id="periodBadge">
+            ☀️ 上午時段
+          </div>
+        </div>
+
+        <div class="canvas-container">
+          <canvas id="timeCanvas" width="600" height="430"></canvas>
+        </div>
+
+        <div class="canvas-toolbar">
+          <span style="font-size:0.86rem; font-weight:800; color:var(--ink-muted);">
+            💡 觀察口訣：<strong>上午不變（補 0），下午時數 + 12！</strong>
+          </span>
+          <button type="button" class="btn" id="toggleOuterRingBtn">
+            👁️ 外圈數字提示：開
+          </button>
+        </div>
+      </section>
+
+      <!-- 右欄：題目與作答面板 -->
+      <aside class="side-panel">
+        <div class="question-card">
+          <!-- 自訂題目設定框（僅在模式 4 顯示） -->
+          <div class="custom-setup-box" id="customSetupBox">
+            <div style="font-weight:900; font-size:0.92rem; color:#831843; margin-bottom:8px;">
+              ✏️ 自訂題目：設定時間並選擇考法
+            </div>
+            <div style="display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+              <label style="font-weight:800; font-size:0.86rem;">24小時時間：</label>
+              <input type="number" id="customH24" min="0" max="23" value="15" style="width:54px; padding:4px; border:2px solid var(--ink-brown); border-radius:8px; font-weight:800; text-align:center;" />
+              <span>:</span>
+              <input type="number" id="customMin" min="0" max="59" value="30" style="width:54px; padding:4px; border:2px solid var(--ink-brown); border-radius:8px; font-weight:800; text-align:center;" />
+              <select id="customAskDir" style="padding:4px 8px; border:2px solid var(--ink-brown); border-radius:8px; font-weight:800;">
+                <option value="to24">考：12小時 ➔ 24小時</option>
+                <option value="to12">考：24小時 ➔ 12小時</option>
+              </select>
+            </div>
+            <button type="button" class="btn btn-green" id="applyCustomQBtn">
+              ✅ 出題並開始作答
+            </button>
+          </div>
+
+          <!-- 題目顯示牌 -->
+          <div class="time-question-board">
+            <div class="q-type-label" id="qPromptLabel">請將以下「12小時報時制」轉為「24小時報時制」：</div>
+            <div class="q-time-value" id="qTimeDisplay">下午 3 : 25</div>
+          </div>
+
+          <!-- 學生輸入區 -->
+          <div class="answer-zone">
+            <div class="answer-zone-title" id="ansZoneTitle">✏️ 第 2 步：輸入 24小時報時制（兩位數）</div>
+
+            <!-- 當目標是 12小時制時顯示「上午 / 下午」選擇器 -->
+            <div class="ampm-selector" id="ampmSelector" style="display:none;">
+              <button type="button" class="ampm-btn selected-am" id="btnSelectAM">☀️ 上午</button>
+              <button type="button" class="ampm-btn" id="btnSelectPM">🌙 下午</button>
+            </div>
+
+            <div class="digital-inputs">
+              <input type="text" inputmode="numeric" maxlength="2" class="time-num-input" id="ansHourInput" placeholder="時" />
+              <span>:</span>
+              <input type="text" inputmode="numeric" maxlength="2" class="time-num-input" id="ansMinInput" placeholder="分" />
+            </div>
+
+            <!-- 上次草稿殘影對照 -->
+            <div class="ghost-draft-pill" id="ghostDraftPill">
+              👻 上次草稿：--
+            </div>
+          </div>
+
+          <div class="character-stage">
+            <div class="char-figure" id="activeCharBox"></div>
+            <div class="speech-bubble">
+              <span class="speech-speaker speaker-chii" id="speakerTag">小八貓</span>
+              <div id="charSpeechText">
+                睇下左邊時鐘，<strong>下午</strong>要加 12 喔！
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="btn big-check-btn" id="checkAnswerBtn">
+            ✅ 第 3 步：檢查答案
+          </button>
+        </div>
+
+        <!-- 檢查結果與引導提示 -->
+        <div class="feedback-box">
+          <div class="status-pill status-wait" id="statusPill">
+            ⏳ 等待檢查答案
+          </div>
+          <div id="feedbackBody">
+            <p style="font-size:0.9rem; color:var(--ink-muted); font-weight:700;">
+              1. <strong>24小時制</strong>唔使寫「上午/下午」，小時要寫齊兩位數（例如 <strong>08:05</strong>）。<br/>
+              2. <strong>12小時制</strong>一定要揀「<strong>上午</strong>」或「<strong>下午</strong>」！
+            </p>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- 答對彈出獎勵卡視窗 (1.png) -->
+  <div class="reward-modal-backdrop" id="rewardModal">
+    <div class="reward-modal-card">
+      <div class="reward-modal-title">🎉 太棒了！時間轉換完全正確！</div>
+      <div class="reward-modal-sub">👏 表現好出色！可以向老師換取一張獎勵卡！</div>
+      <div class="reward-img-box">
+        <img src="1.png" alt="品德好學生表揚卡 (1.png)" onerror="this.style.display='none'; document.getElementById('imgFallbackNote').style.display='block';" />
+        <div id="imgFallbackNote" style="display:none; padding:24px 12px; color:#be185d; font-weight:800;">
+          🏅 品德好學生表揚卡 (1.png)<br/>
+          <span style="font-size:0.82rem; color:#7c6553;">（請確保 1.png 與此網頁放在同一個資料夾內）</span>
+        </div>
+      </div>
+      <button type="button" class="btn btn-pink" id="closeRewardModalBtn" style="width:100%; justify-content:center; font-size:1.05rem; padding:10px;">
+        ✨ 太好了！繼續挑戰下一題
+      </button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const canvas = document.getElementById("timeCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // ====== 題庫設計（涵蓋上午補0、下午+12、中午12時與午夜00時陷阱） ======
+      const QUESTION_POOLS = {
+        to24: [
+          { h24: 15, min: 25, ask: "to24" },
+          { h24: 8, min: 5, ask: "to24" },
+          { h24: 19, min: 40, ask: "to24" },
+          { h24: 14, min: 10, ask: "to24" },
+          { h24: 9, min: 30, ask: "to24" },
+          { h24: 21, min: 15, ask: "to24" },
+          { h24: 16, min: 50, ask: "to24" }
+        ],
+        to12: [
+          { h24: 17, min: 20, ask: "to12" },
+          { h24: 7, min: 45, ask: "to12" },
+          { h24: 20, min: 10, ask: "to12" },
+          { h24: 13, min: 35, ask: "to12" },
+          { h24: 22, min: 5, ask: "to12" },
+          { h24: 10, min: 55, ask: "to12" }
+        ],
+        traps: [
+          { h24: 0, min: 15, ask: "to24" },  // 上午 12:15 -> 00:15
+          { h24: 12, min: 30, ask: "to24" }, // 下午 12:30 -> 12:30
+          { h24: 0, min: 45, ask: "to12" },  // 00:45 -> 上午 12:45
+          { h24: 12, min: 10, ask: "to12" }, // 12:10 -> 下午 12:10
+          { h24: 0, min: 0, ask: "to24" },   // 上午 12:00 -> 00:00
+          { h24: 12, min: 0, ask: "to12" }   // 12:00 -> 下午 12:00
+        ]
+      };
+
+      // ====== 狀態管理 ======
+      let currentMode = "to24"; // 'to24' | 'to12' | 'traps' | 'custom'
+      let visualMode = "clock"; // 'clock' (雙圈時鐘) | 'ruler' (24小時時間尺)
+      let showOuterRing = true;
+
+      let poolIdx = 0;
+      let currentQ = { h24: 15, min: 25, ask: "to24" };
+      let selectedPeriod = "AM"; // 'AM' | 'PM'（當 ask === 'to12' 時使用）
+      let lastDraftText = "";
+
+      // +12 / -12 魔法動畫狀態
+      let isAnimatingJump = false;
+      let jumpAnimProgress = 0;
+
+      let stampCount = 0;
+
+      // ====== DOM 元素 ======
+      const modeChips = document.querySelectorAll(".preset-chip[data-mode]");
+      const viewClockBtn = document.getElementById("viewClockBtn");
+      const viewRulerBtn = document.getElementById("viewRulerBtn");
+      const magicJumpBtn = document.getElementById("magicJumpBtn");
+      const nextRandomQBtn = document.getElementById("nextRandomQBtn");
+      const toggleOuterRingBtn = document.getElementById("toggleOuterRingBtn");
+      const visualTitleBadge = document.getElementById("visualTitleBadge");
+      const periodBadge = document.getElementById("periodBadge");
+
+      const customSetupBox = document.getElementById("customSetupBox");
+      const customH24 = document.getElementById("customH24");
+      const customMin = document.getElementById("customMin");
+      const customAskDir = document.getElementById("customAskDir");
+      const applyCustomQBtn = document.getElementById("applyCustomQBtn");
+
+      const qPromptLabel = document.getElementById("qPromptLabel");
+      const qTimeDisplay = document.getElementById("qTimeDisplay");
+      const ansZoneTitle = document.getElementById("ansZoneTitle");
+      const ampmSelector = document.getElementById("ampmSelector");
+      const btnSelectAM = document.getElementById("btnSelectAM");
+      const btnSelectPM = document.getElementById("btnSelectPM");
+      const ansHourInput = document.getElementById("ansHourInput");
+      const ansMinInput = document.getElementById("ansMinInput");
+      const ghostDraftPill = document.getElementById("ghostDraftPill");
+
+      const activeCharBox = document.getElementById("activeCharBox");
+      const speakerTag = document.getElementById("speakerTag");
+      const charSpeechText = document.getElementById("charSpeechText");
+      const checkAnswerBtn = document.getElementById("checkAnswerBtn");
+      const statusPill = document.getElementById("statusPill");
+      const feedbackBody = document.getElementById("feedbackBody");
+      const stampCountEl = document.getElementById("stampCount");
+
+      const rewardModal = document.getElementById("rewardModal");
+      const closeRewardModalBtn = document.getElementById("closeRewardModalBtn");
+      const viewRewardCardBtn = document.getElementById("viewRewardCardBtn");
+
+      closeRewardModalBtn.addEventListener("click", () => rewardModal.classList.remove("show"));
+      viewRewardCardBtn.addEventListener("click", () => rewardModal.classList.add("show"));
+
+      function pad2(n) {
+        return String(n).padStart(2, "0");
+      }
+
+      // 將 24 小時制轉為標準香港小學 12 小時制結構
+      function get12HourParts(h24, min) {
+        const isPM = h24 >= 12;
+        const period = isPM ? "PM" : "AM";
+        const periodLabel = isPM ? "下午" : "上午";
+        let h12 = h24 % 12;
+        if (h12 === 0) h12 = 12;
+        return { period, periodLabel, h12, min };
+      }
+
+      function getCharacterSVG(mood) {
+        if (mood === "happy_usagi") {
+          return `
+            <svg width="54" height="54" viewBox="0 0 64 64">
+              <rect x="17" y="3" width="9" height="22" rx="4.5" fill="#fef08a" stroke="#4a3728" stroke-width="3.2"/>
+              <rect x="38" y="3" width="9" height="22" rx="4.5" fill="#fef08a" stroke="#4a3728" stroke-width="3.2"/>
+              <circle cx="32" cy="38" r="20" fill="#fef08a" stroke="#4a3728" stroke-width="3.2"/>
+              <ellipse cx="19" cy="41" rx="4.2" ry="2.5" fill="#fca5a5"/>
+              <ellipse cx="45" cy="41" rx="4.2" ry="2.5" fill="#fca5a5"/>
+              <path d="M21 34 Q24 30 27 34" fill="none" stroke="#4a3728" stroke-width="2.8" stroke-linecap="round"/>
+              <path d="M37 34 Q40 30 43 34" fill="none" stroke="#4a3728" stroke-width="2.8" stroke-linecap="round"/>
+              <path d="M27 40 Q32 46 37 40 Z" fill="#f43f5e" stroke="#4a3728" stroke-width="2.2"/>
+            </svg>`;
+        }
+        if (mood === "thinking_hachi") {
+          return `
+            <svg width="54" height="54" viewBox="0 0 64 64">
+              <polygon points="12,24 16,8 27,18" fill="#7dd3fc" stroke="#4a3728" stroke-width="3.2" stroke-linejoin="round"/>
+              <polygon points="52,24 48,8 37,18" fill="#7dd3fc" stroke="#4a3728" stroke-width="3.2" stroke-linejoin="round"/>
+              <circle cx="32" cy="36" r="21" fill="#fff" stroke="#4a3728" stroke-width="3.2"/>
+              <path d="M13,27 Q24,25 32,16 Q40,25 51,27 A21,21 0 0,0 13,27 Z" fill="#7dd3fc"/>
+              <circle cx="24" cy="34" r="3" fill="#4a3728"/>
+              <circle cx="40" cy="34" r="3" fill="#4a3728"/>
+              <path d="M28 40 Q32 43 36 40" fill="none" stroke="#4a3728" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>`;
+        }
+        return `
+          <svg width="54" height="54" viewBox="0 0 64 64">
+            <circle cx="16" cy="16" r="9" fill="#fff" stroke="#4a3728" stroke-width="3.2"/>
+            <circle cx="48" cy="16" r="9" fill="#fff" stroke="#4a3728" stroke-width="3.2"/>
+            <circle cx="32" cy="35" r="22" fill="#fff" stroke="#4a3728" stroke-width="3.2"/>
+            <ellipse cx="19" cy="39" rx="4.5" ry="2.6" fill="#f9a8d4"/>
+            <ellipse cx="45" cy="39" rx="4.5" ry="2.6" fill="#f9a8d4"/>
+            <circle cx="24" cy="33" r="3" fill="#4a3728"/>
+            <circle cx="40" cy="33" r="3" fill="#4a3728"/>
+            <path d="M29 38 Q32 41 35 38" fill="none" stroke="#4a3728" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>`;
+      }
+
+      function setCharacterDialogue(mood, speakerName, speakerClass, htmlText) {
+        activeCharBox.innerHTML = getCharacterSVG(mood);
+        speakerTag.className = "speech-speaker " + speakerClass;
+        speakerTag.textContent = speakerName;
+        charSpeechText.innerHTML = htmlText;
+      }
+
+      // ====== 繪製畫布：模式 A「內外雙圈時鐘」 vs 模式 B「24小時時間尺」 ======
+      function renderVisualCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const { h24, min } = currentQ;
+        const parts12 = get12HourParts(h24, min);
+
+        if (visualMode === "clock") {
+          drawDualRingClock(h24, min, parts12);
+        } else {
+          draw24HourRuler(h24, min, parts12);
+        }
+      }
+
+      function drawDualRingClock(h24, min, parts12) {
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2 + 4;
+        const outerR = 172;
+        const innerR = 118;
+
+        // 背景柔和裝飾
+        ctx.fillStyle = h24 >= 12 ? "#f8fafc" : "#fffdf7";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 外圈底盤（24小時制下午圈）
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, outerR + 24, 0, Math.PI * 2);
+        ctx.fillStyle = "#e0f2fe";
+        ctx.strokeStyle = "#4a3728";
+        ctx.lineWidth = 3.5;
+        ctx.fill();
+        ctx.stroke();
+
+        // 內圈底盤（12小時制圈）
+        ctx.beginPath();
+        ctx.arc(cx, cy, innerR + 22, 0, Math.PI * 2);
+        ctx.fillStyle = "#fffdf9";
+        ctx.strokeStyle = "#7dd3fc";
+        ctx.lineWidth = 2.5;
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+
+        // 繪製 60 分鐘刻度
+        for (let m = 0; m < 60; m++) {
+          const ang = ((m - 15) * Math.PI * 2) / 60;
+          const r1 = innerR + 16;
+          const r2 = m % 5 === 0 ? innerR + 8 : innerR + 12;
+          ctx.strokeStyle = m % 5 === 0 ? "#4a3728" : "#cbd5e1";
+          ctx.lineWidth = m % 5 === 0 ? 2.2 : 1;
+          ctx.beginPath();
+          ctx.moveTo(cx + Math.cos(ang) * r1, cy + Math.sin(ang) * r1);
+          ctx.lineTo(cx + Math.cos(ang) * r2, cy + Math.sin(ang) * r2);
+          ctx.stroke();
+        }
+
+        // 繪製內圈 (1~12) 與外圈 (13~23 / 00) 數字
+        for (let i = 1; i <= 12; i++) {
+          const ang = ((i - 3) * Math.PI * 2) / 12;
+          const inX = cx + Math.cos(ang) * (innerR - 8);
+          const inY = cy + Math.sin(ang) * (innerR - 8);
+          const outX = cx + Math.cos(ang) * outerR;
+          const outY = cy + Math.sin(ang) * outerR;
+
+          const isTargetHour = parts12.h12 === i;
+
+          // 內圈 1~12
+          ctx.save();
+          if (isTargetHour) {
+            ctx.beginPath();
+            ctx.arc(inX, inY, 17, 0, Math.PI * 2);
+            ctx.fillStyle = "#fef08a";
+            ctx.strokeStyle = "#ca8a04";
+            ctx.lineWidth = 2.5;
+            ctx.fill();
+            ctx.stroke();
+          }
+          ctx.fillStyle = "#4a3728";
+          ctx.font = "900 18px 'PingFang HK', sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(String(i), inX, inY + 1);
+          ctx.restore();
+
+          // 外圈 24小時制對應數字
+          if (showOuterRing) {
+            let outerLabel = i === 12 ? (h24 === 12 ? "12" : "00") : String(i + 12);
+            ctx.save();
+            if (isTargetHour) {
+              ctx.beginPath();
+              ctx.arc(outX, outY, 19, 0, Math.PI * 2);
+              ctx.fillStyle = "#fbcfe8";
+              ctx.strokeStyle = "#db2777";
+              ctx.lineWidth = 2.5;
+              ctx.fill();
+              ctx.stroke();
+            }
+            ctx.fillStyle = isTargetHour ? "#be185d" : "#0369a1";
+            ctx.font = "900 15px 'PingFang HK', sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(outerLabel, outX, outY + 1);
+            ctx.restore();
+          }
+
+          // 若正在播放 +12 / -12 魔法動畫，畫出內外圈跳躍光球與提示標籤
+          if (isAnimatingJump && isTargetHour) {
+            const fromPt = currentQ.ask === "to24" ? { x: inX, y: inY } : { x: outX, y: outY };
+            const toPt = currentQ.ask === "to24" ? { x: outX, y: outY } : { x: inX, y: inY };
+            const curX = fromPt.x + (toPt.x - fromPt.x) * jumpAnimProgress;
+            const curY = fromPt.y + (toPt.y - fromPt.y) * jumpAnimProgress;
+
+            ctx.save();
+            ctx.strokeStyle = "#e11d48";
+            ctx.lineWidth = 3;
+            ctx.setLineDash([4, 3]);
+            ctx.beginPath();
+            ctx.moveTo(fromPt.x, fromPt.y);
+            ctx.lineTo(toPt.x, toPt.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.beginPath();
+            ctx.arc(curX, curY, 12, 0, Math.PI * 2);
+            ctx.fillStyle = "#f43f5e";
+            ctx.fill();
+
+            let magicText = "";
+            if (h24 === 0) magicText = "午夜12時 ➔ 00";
+            else if (h24 === 12) magicText = "中午12時 ➔ 12 (不變)";
+            else if (h24 > 12) magicText = currentQ.ask === "to24" ? "下午 +12" : "下午 -12";
+            else magicText = "上午不變 (補0)";
+
+            ctx.font = "bold 14px sans-serif";
+            const tw = ctx.measureText(magicText).width + 16;
+            ctx.fillStyle = "#fff1f2";
+            ctx.strokeStyle = "#e11d48";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(cx - tw / 2, 14, tw, 28, 10);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = "#be123c";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(magicText, cx, 28);
+            ctx.restore();
+          }
+        }
+
+        // 繪製時針與分針
+        const minAngle = ((min - 15) * Math.PI * 2) / 60;
+        const hourAngle = (((parts12.h12 % 12) + min / 60 - 3) * Math.PI * 2) / 12;
+
+        // 分針（藍色長針）
+        ctx.save();
+        ctx.strokeStyle = "#0284c7";
+        ctx.lineWidth = 5;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(minAngle) * (innerR - 22), cy + Math.sin(minAngle) * (innerR - 22));
+        ctx.stroke();
+
+        // 時針（粉紅短粗針）
+        ctx.strokeStyle = "#e11d48";
+        ctx.lineWidth = 7;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(hourAngle) * (innerR - 50), cy + Math.sin(hourAngle) * (innerR - 50));
+        ctx.stroke();
+
+        // 中心圓軸
+        ctx.beginPath();
+        ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+        ctx.fillStyle = "#4a3728";
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 模式 B：攤開 24小時時間尺
+      function draw24HourRuler(h24, min, parts12) {
+        ctx.fillStyle = "#fffdf9";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const padX = 34;
+        const trackW = canvas.width - padX * 2;
+        const stepW = trackW / 24;
+        const rulerY = 200;
+
+        // 上半部：上午 (0~11) 與 下午 (12~23) 色塊
+        ctx.save();
+        // 上午色塊
+        ctx.fillStyle = "#fef9c3";
+        ctx.strokeStyle = "#4a3728";
+        ctx.lineWidth = 2.5;
+        ctx.fillRect(padX, rulerY - 56, stepW * 12, 56);
+        ctx.strokeRect(padX, rulerY - 56, stepW * 12, 56);
+        ctx.fillStyle = "#854d0e";
+        ctx.font = "900 15px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("☀️ 上午 (AM)：00:00 ~ 11:59（時數不變）", padX + stepW * 6, rulerY - 80);
+
+        // 下午色塊
+        ctx.fillStyle = "#e0f2fe";
+        ctx.fillRect(padX + stepW * 12, rulerY - 56, stepW * 12, 56);
+        ctx.strokeRect(padX + stepW * 12, rulerY - 56, stepW * 12, 56);
+        ctx.fillStyle = "#0369a1";
+        ctx.fillText("🌙 下午 (PM)：12:00 ~ 23:59（1時後 +12）", padX + stepW * 18, rulerY - 80);
+
+        // 下半部 24小時制色塊
+        ctx.fillStyle = "#fdf2f8";
+        ctx.fillRect(padX, rulerY, trackW, 56);
+        ctx.strokeRect(padX, rulerY, trackW, 56);
+        ctx.restore();
+
+        // 繪製 0 ~ 24 刻度
+        for (let h = 0; h <= 24; h++) {
+          const x = padX + h * stepW;
+          ctx.strokeStyle = h % 12 === 0 ? "#e11d48" : "#94a3b8";
+          ctx.lineWidth = h % 12 === 0 ? 2.5 : 1;
+          ctx.beginPath();
+          ctx.moveTo(x, rulerY - 56);
+          ctx.lineTo(x, rulerY + 56);
+          ctx.stroke();
+
+          if (h < 24) {
+            const h12Label = h % 12 === 0 ? 12 : h % 12;
+            const isTarget = h === h24;
+
+            // 上排：12小時制數字
+            ctx.fillStyle = isTarget ? "#be123c" : "#4a3728";
+            ctx.font = isTarget ? "900 13px sans-serif" : "bold 11px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(String(h12Label), x + stepW / 2, rulerY - 22);
+
+            // 下排：24小時制數字
+            if (showOuterRing) {
+              ctx.fillStyle = isTarget ? "#be123c" : "#0369a1";
+              ctx.fillText(pad2(h), x + stepW / 2, rulerY + 32);
+            }
+          }
+        }
+
+        // 標出目前題目所在的時間指針
+        const markerX = padX + (h24 + min / 60) * stepW;
+        ctx.save();
+        ctx.strokeStyle = "#e11d48";
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.moveTo(markerX, rulerY - 68);
+        ctx.lineTo(markerX, rulerY + 72);
+        ctx.stroke();
+
+        ctx.fillStyle = "#ffe4e6";
+        ctx.strokeStyle = "#e11d48";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.roundRect(Math.max(20, Math.min(canvas.width - 170, markerX - 75)), rulerY + 82, 150, 34, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#be123c";
+        ctx.font = "900 14px sans-serif";
+        ctx.textAlign = "center";
+        const tagStr = `${parts12.periodLabel} ${parts12.h12}:${pad2(min)}`;
+        ctx.fillText(tagStr, Math.max(95, Math.min(canvas.width - 95, markerX)), rulerY + 103);
+        ctx.restore();
+      }
+
+      // ====== 載入題目並更新作答區介面 ======
+      function loadQuestion(qObj) {
+        currentQ = qObj;
+        const { h24, min, ask } = currentQ;
+        const parts12 = get12HourParts(h24, min);
+
+        // 更新上方時段徽章
+        if (h24 === 0) {
+          periodBadge.className = "period-badge night";
+          periodBadge.textContent = "🌙 午夜 12 時（00 時）";
+        } else if (h24 === 12) {
+          periodBadge.className = "period-badge";
+          periodBadge.textContent = "☀️ 中午 12 時（12 時）";
+        } else if (h24 > 12) {
+          periodBadge.className = "period-badge night";
+          periodBadge.textContent = "🌆 下午時段（+12）";
+        } else {
+          periodBadge.className = "period-badge";
+          periodBadge.textContent = "☀️ 上午時段（時數不變）";
+        }
+
+        // 清空輸入框與錯誤紅框
+        ansHourInput.value = "";
+        ansMinInput.value = "";
+        ansHourInput.classList.remove("wrong-box");
+        ansMinInput.classList.remove("wrong-box");
+        ghostDraftPill.classList.remove("show");
+
+        if (ask === "to24") {
+          qPromptLabel.textContent = "請將以下「12小時報時制」轉為「24小時報時制」：";
+          qTimeDisplay.textContent = `${parts12.periodLabel} ${parts12.h12} : ${pad2(min)}`;
+          ansZoneTitle.textContent = "✏️ 第 2 步：輸入 24小時報時制（兩位數，如 08:05）";
+          ampmSelector.style.display = "none";
+          ansHourInput.placeholder = "00";
+          ansMinInput.placeholder = "00";
+        } else {
+          qPromptLabel.textContent = "請將以下「24小時報時制」轉為「12小時報時制」：";
+          qTimeDisplay.textContent = `${pad2(h24)} : ${pad2(min)}`;
+          ansZoneTitle.textContent = "✏️ 第 2 步：先揀「上午/下午」，再輸入時間";
+          ampmSelector.style.display = "inline-flex";
+          selectPeriodUI("AM");
+          ansHourInput.placeholder = "時";
+          ansMinInput.placeholder = "00";
+        }
+
+        statusPill.className = "status-pill status-wait";
+        statusPill.textContent = "⏳ 等待檢查答案";
+        feedbackBody.innerHTML = `
+          <p style="font-size:0.9rem; color:var(--ink-muted); font-weight:700;">
+            1. <strong>上午</strong>：時數不變（午夜12時變 <strong>00</strong>）。<br/>
+            2. <strong>下午</strong>：時數 <strong>+ 12</strong>（中午12時保持 <strong>12</strong>）。
+          </p>
+        `;
+
+        setCharacterDialogue(
+          "default_chii",
+          "小八貓",
+          "speaker-chii",
+          ask === "to24"
+            ? `題目係「<strong>${parts12.periodLabel} ${parts12.h12}:${pad2(min)}</strong>」，轉做 24小時制係幾點呢？`
+            : `題目係「<strong>${pad2(h24)}:${pad2(min)}</strong>」，記得先揀<strong>上午</strong>定<strong>下午</strong>喔！`
+        );
+
+        renderVisualCanvas();
+      }
+
+      function selectPeriodUI(p) {
+        selectedPeriod = p;
+        btnSelectAM.className = p === "AM" ? "ampm-btn selected-am" : "ampm-btn";
+        btnSelectPM.className = p === "PM" ? "ampm-btn selected-pm" : "ampm-btn";
+      }
+
+      btnSelectAM.addEventListener("click", () => selectPeriodUI("AM"));
+      btnSelectPM.addEventListener("click", () => selectPeriodUI("PM"));
+
+      // ====== 檢查答案與針對性引導（不直接給答案） ======
+      checkAnswerBtn.addEventListener("click", () => {
+        const rawH = ansHourInput.value.trim();
+        const rawM = ansMinInput.value.trim();
+
+        if (rawH === "" || rawM === "" || isNaN(Number(rawH)) || isNaN(Number(rawM))) {
+          alert("請在方格內輸入「時」和「分」的數字！");
+          return;
+        }
+
+        const numH = parseInt(rawH, 10);
+        const numM = parseInt(rawM, 10);
+        const { h24, min, ask } = currentQ;
+        const parts12 = get12HourParts(h24, min);
+
+        ansHourInput.classList.remove("wrong-box");
+        ansMinInput.classList.remove("wrong-box");
+
+        // 儲存上次草稿殘影
+        lastDraftText =
+          ask === "to24"
+            ? `${rawH}:${rawM}`
+            : `${selectedPeriod === "AM" ? "上午" : "下午"} ${rawH}:${rawM}`;
+        ghostDraftPill.textContent = `👻 上次草稿：${lastDraftText}`;
+        ghostDraftPill.classList.add("show");
+
+        // 情況 A：考 12小時 ➔ 24小時
+        if (ask === "to24") {
+          const isHourValOk = numH === h24;
+          const isHourTwoDigits = rawH.length === 2; // 24小時制要求兩位數如 08
+          const isMinValOk = numM === min && rawM.length === 2;
+
+          if (isHourValOk && isHourTwoDigits && isMinValOk) {
+            handleCorrectVictory(`${parts12.periodLabel} ${parts12.h12}:${pad2(min)} = ${pad2(h24)}:${pad2(min)}`);
+            return;
+          }
+
+          // 針對常見錯誤給出精簡提示
+          let hint1 = "";
+          if (numM !== min || rawM.length !== 2) {
+            ansMinInput.classList.add("wrong-box");
+            hint1 = `分鐘數要保持一樣，而且要寫齊兩位數（例如 5 分要寫 <strong>05</strong>）！`;
+          } else if (isHourValOk && !isHourTwoDigits) {
+            ansHourInput.classList.add("wrong-box");
+            hint1 = `小時數算對了！但 <strong>24小時報時制</strong>的小時必須寫齊<strong>兩位數</strong>，請在前面補 <strong>0</strong>！`;
+          } else {
+            ansHourInput.classList.add("wrong-box");
+            if (h24 === 0) {
+              hint1 = `⚠️ <strong>午夜12時陷阱</strong>：新的一天剛開始，上午 12 時在 24小時制要寫成 <strong>00</strong> 時！`;
+            } else if (h24 === 12) {
+              hint1 = `⚠️ <strong>中午12時陷阱</strong>：下午 12 時即是正午，不用加 12，保持 <strong>12</strong> 時就可以！`;
+            } else if (h24 > 12) {
+              hint1 = `題目是「<strong>下午</strong>」，時數要<strong>加 12</strong>（睇下左邊時鐘外圈，或者按「✨ 施展 +12 魔法」）！`;
+            } else {
+              hint1 = `題目是「<strong>上午</strong>」，時數不用加 12，只要在個位數前面補 <strong>0</strong> 就可以！`;
+            }
+          }
+
+          showGuidedRetry(hint1);
+          return;
+        }
+
+        // 情況 B：考 24小時 ➔ 12小時
+        const isPeriodOk = selectedPeriod === parts12.period;
+        const isHourOk = numH === parts12.h12;
+        const isMinOk = numM === min && rawM.length === 2;
+
+        if (isPeriodOk && isHourOk && isMinOk) {
+          handleCorrectVictory(`${pad2(h24)}:${pad2(min)} = ${parts12.periodLabel} ${parts12.h12}:${pad2(min)}`);
+          return;
+        }
+
+        let hint1 = "";
+        if (!isPeriodOk) {
+          hint1 =
+            h24 >= 12
+              ? `小時數是 <strong>${pad2(h24)}</strong>（12 或以上），屬於「<strong>🌙 下午</strong>」時段喔！請先按「下午」按鈕。`
+              : `小時數是 <strong>${pad2(h24)}</strong>（小於 12），屬於「<strong>☀️ 上午</strong>」時段喔！請先按「上午」按鈕。`;
+        } else if (!isHourOk) {
+          ansHourInput.classList.add("wrong-box");
+          if (h24 === 0) {
+            hint1 = `⚠️ <strong>00 時陷阱</strong>：24小時制的 <strong>00 時</strong>，即是半夜「<strong>上午 12 時</strong>」！`;
+          } else if (h24 === 12) {
+            hint1 = `⚠️ <strong>12 時陷阱</strong>：24小時制的 <strong>12 時</strong>，即是正午「<strong>下午 12 時</strong>」！`;
+          } else if (h24 > 12) {
+            hint1 = `超過 12 時，轉做 12小時制要<strong>減 12</strong>（試下算 ${h24} - 12）！`;
+          } else {
+            hint1 = `上午時段的小時數不用減 12，直接寫 <strong>${parts12.h12}</strong> 就可以！`;
+          }
+        } else {
+          ansMinInput.classList.add("wrong-box");
+          hint1 = `分鐘數要寫齊兩位數（例如 05）喔！`;
+        }
+
+        showGuidedRetry(hint1);
+      });
+
+      function handleCorrectVictory(equationStr) {
+        stampCount++;
+        stampCountEl.textContent = stampCount;
+        viewRewardCardBtn.style.display = "inline-flex";
+
+        statusPill.className = "status-pill status-ok";
+        statusPill.textContent = "🎉 完全正確！";
+
+        setCharacterDialogue(
+          "happy_usagi",
+          "吉伊卡哇 & 兔兔",
+          "speaker-usagi",
+          `答對了！<strong>${equationStr}</strong>！快向老師換取獎勵卡！`
+        );
+
+        feedbackBody.innerHTML = `
+          <div class="stamp-victory">
+            <p style="font-weight:900; color:#15803d; font-size:1rem; margin-bottom:8px;">
+              ✨ ${equationStr}
+            </p>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
+              <button type="button" class="btn btn-pink" id="openCardAgainBtn">
+                🎁 顯示獎勵卡
+              </button>
+              <button type="button" class="btn btn-yellow" id="victoryNextQBtn">
+                🚀 挑戰下一題
+              </button>
+            </div>
+          </div>
+        `;
+
+        document.getElementById("openCardAgainBtn").addEventListener("click", () => {
+          rewardModal.classList.add("show");
+        });
+
+        document.getElementById("victoryNextQBtn").addEventListener("click", () => {
+          pickNextQuestion();
+        });
+
+        rewardModal.classList.add("show");
+      }
+
+      function showGuidedRetry(hintText) {
+        statusPill.className = "status-pill status-retry";
+        statusPill.textContent = "❌ 還差一點點喔！睇下小八貓提示";
+
+        setCharacterDialogue(
+          "thinking_hachi",
+          "小八貓",
+          "speaker-hachi",
+          `已幫你保留剛才寫的「<strong>${lastDraftText}</strong>」草稿，跟住下面提示改一改就啱喇！`
+        );
+
+        feedbackBody.innerHTML = `
+          <div class="guide-step step-pink">
+            <div class="guide-step-title">🐾 提示 1：邊度要注意？</div>
+            <p>${hintText}</p>
+          </div>
+
+          <div class="guide-step step-yellow">
+            <div class="guide-step-title">💡 提示 2：用魔法動畫幫手</div>
+            <p>按下面按鈕睇下時鐘內外圈點樣轉換！</p>
+            <button type="button" class="btn btn-yellow" id="guideMagicBtn">
+              ✨ 播放 +12 / -12 魔法動畫
+            </button>
+          </div>
+        `;
+
+        document.getElementById("guideMagicBtn").addEventListener("click", () => {
+          triggerMagicJumpAnim();
+        });
+      }
+
+      // ====== 播放 +12 / -12 魔法動畫 ======
+      function triggerMagicJumpAnim() {
+        if (isAnimatingJump) return;
+        visualMode = "clock";
+        updateVisualModeButtons();
+        isAnimatingJump = true;
+        jumpAnimProgress = 0;
+
+        function step() {
+          jumpAnimProgress += 0.03;
+          if (jumpAnimProgress >= 1) {
+            jumpAnimProgress = 1;
+            renderVisualCanvas();
+            setTimeout(() => {
+              isAnimatingJump = false;
+              renderVisualCanvas();
+            }, 900);
+            return;
+          }
+          renderVisualCanvas();
+          requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }
+
+      magicJumpBtn.addEventListener("click", triggerMagicJumpAnim);
+
+      // ====== 切換題庫模式與工具模式 ======
+      function pickNextQuestion() {
+        if (currentMode === "custom") return;
+        const pool = QUESTION_POOLS[currentMode];
+        poolIdx = (poolIdx + 1) % pool.length;
+        loadQuestion(pool[poolIdx]);
+      }
+
+      nextRandomQBtn.addEventListener("click", pickNextQuestion);
+
+      modeChips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          currentMode = chip.dataset.mode;
+          modeChips.forEach((c) => c.classList.toggle("active", c === chip));
+
+          if (currentMode === "custom") {
+            customSetupBox.classList.add("show");
+            applyCustomQuestion();
+          } else {
+            customSetupBox.classList.remove("show");
+            poolIdx = 0;
+            loadQuestion(QUESTION_POOLS[currentMode][0]);
+          }
+        });
+      });
+
+      function applyCustomQuestion() {
+        let h = parseInt(customH24.value, 10);
+        let m = parseInt(customMin.value, 10);
+        if (isNaN(h) || h < 0 || h > 23) h = 15;
+        if (isNaN(m) || m < 0 || m > 59) m = 30;
+        customH24.value = h;
+        customMin.value = m;
+        loadQuestion({ h24: h, min: m, ask: customAskDir.value });
+      }
+
+      applyCustomQBtn.addEventListener("click", applyCustomQuestion);
+
+      function updateVisualModeButtons() {
+        viewClockBtn.classList.toggle("board-active", visualMode === "clock");
+        viewRulerBtn.classList.toggle("board-active", visualMode === "ruler");
+        visualTitleBadge.textContent =
+          visualMode === "clock"
+            ? "🕰️ 內圈：上午 (1~12) ｜ 外圈：下午 (+12)"
+            : "📏 上排：12小時制 ｜ 下排：24小時制";
+      }
+
+      viewClockBtn.addEventListener("click", () => {
+        visualMode = "clock";
+        updateVisualModeButtons();
+        renderVisualCanvas();
+      });
+
+      viewRulerBtn.addEventListener("click", () => {
+        visualMode = "ruler";
+        updateVisualModeButtons();
+        renderVisualCanvas();
+      });
+
+      toggleOuterRingBtn.addEventListener("click", () => {
+        showOuterRing = !showOuterRing;
+        toggleOuterRingBtn.textContent = `👁️ 外圈數字提示：${showOuterRing ? "開" : "關"}`;
+        renderVisualCanvas();
+      });
+
+      // 支援按 Enter 鍵直接檢查答案
+      ansHourInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") checkAnswerBtn.click();
+      });
+      ansMinInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") checkAnswerBtn.click();
+      });
+
+      // 預設載入第一題
+      loadQuestion(QUESTION_POOLS.to24[0]);
+    })();
+  </script>
+</body>
+</html>
